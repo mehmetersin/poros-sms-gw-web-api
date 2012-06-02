@@ -1,0 +1,15 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
+
+	<bean id="configBean" class="com.poros.smsgw.smpp.gateway.ConfigBean">
+		<property name="remoteipaddress" value="localhost" />
+		<property name="remoteport" value="5151" />
+		<property name="systemid" value="pavel" />
+		<property name="password" value="wpsd" />
+		<property name="systemtype" value="test" />
+		<property name="addressrange" value="8080" />
+		<property name="reconnectInterval" value="10000" />
+
+	</bean>
+
+</beans>

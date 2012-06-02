@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:context="http://www.springframework.org/schema/context" xmlns:task="http://www.springframework.org/schema/task" xmlns:jaxrs="http://cxf.apache.org/jaxrs" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
+http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd 
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
+
+	<context:annotation-config />
+	<bean class="org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor" />
+
+
+	<bean id="placeholderConfig" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="location" value="classpath:datasource.properties">
+			<!--reads config.properties file-->
+		</property>
+</bean>
+	
+		<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+			<property name="driverClassName" value="${driverClassName}" />
+			<property name="url" value="${url}" />
+			<property name="username" value="${username}" />
+			<property name="password" value="${password}" />
+			<property name="initialSize" value="${initialSize}" />
+			<property name="maxActive" value="${maxActive}" />
+			<property name="minIdle" value="${minIdle}" />
+		</bean>
+
+
+
+
+		<import resource="scheduler.xml" />
+		<import resource="snmp.xml" />
+
+
+
+
+		<!-- Beans Configuration -->
+
+		<bean id="smppAdapter" class="com.poros.smsgw.smpp.SmppAdapterImpl" />
+
+		<bean id="messageStoreAdapter" class="com.poros.smsgw.ms.MessageStoreAdapterImpl">
+			<property name="dataSource" ref="dataSource" />
+		</bean>
+
+		<bean id="userAdapter" class="com.poros.smsgw.user.UserAdapterImpl">
+			<property name="dataSource" ref="dataSource" />
+		</bean>
+
+		<bean id="senderEngine" class="com.poros.smsgw.engine.MessageSenderEngine">
+			<property name="smppAdapter" ref="smppAdapter" />
+			<property name="messageStoreAdapter" ref="messageStoreAdapter" />
+		</bean>
+
+		<bean id="autoGateway" class="com.poros.smsgw.smpp.gateway.AutoReconnectGateway" />
+
+
+		<!-- Restful Configuration -->
+
+		<bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider" />
+
+		<jaxrs:server id="smsServiceRest" address="/SmsServiceRest">
+			<jaxrs:extensionMappings>
+				<entry key="xml" value="application/xml" />
+			</jaxrs:extensionMappings>
+			<jaxrs:serviceBeans>
+				<ref bean="SmsServiceRest" />
+			</jaxrs:serviceBeans>
+			<jaxrs:providers>
+				<ref bean="jaxbProvider" />
+			</jaxrs:providers>
+		</jaxrs:server>
+
+		<bean id="SmsServiceRest" class="com.poros.smsgw.rest.SmsServiceRestImpl">
+			<property name="userAdapter" ref="userAdapter" />
+			<property name="messageStoreAdapter" ref="messageStoreAdapter" />
+			<property name="senderEngine" ref="senderEngine" />
+		</bean>
+
+		<!-- Web Service Configuration -->
+		<jaxws:endpoint id="smsServiceWsEP" implementor="#SmsServiceWs" address="/SmsServiceWs" />
+
+		<bean id="SmsServiceWs" class="com.poros.smsgw.ws.SmsServiceWsImpl">
+			<property name="userAdapter" ref="userAdapter" />
+			<property name="messageStoreAdapter" ref="messageStoreAdapter" />
+			<property name="senderEngine" ref="senderEngine" />
+		</bean>
+
+
+	</beans>

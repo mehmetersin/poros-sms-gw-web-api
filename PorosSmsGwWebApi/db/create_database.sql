@@ -1,0 +1,14 @@
+CREATE TABLE  `MESSAGES` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `source` varchar(100) NOT NULL,
+  `message` varchar(1000) NOT NULL,
+  `destination` varchar(100) NOT NULL,
+  `createTimestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `sendingStatus` tinyint(4) DEFAULT '1',
+  `userId` int(11) NOT NULL,
+  `messageTransactionId` varchar(100) DEFAULT NULL,
+  `retryCount` int(11) NOT NULL DEFAULT '1',
+  `messageState` tinyint(4) DEFAULT '0',
+  `processingTimestamp` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM AUTO_INCREMENT=61416 DEFAULT CHARSET=latin1
