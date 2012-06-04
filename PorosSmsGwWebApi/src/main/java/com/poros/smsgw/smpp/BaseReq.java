@@ -1,5 +1,6 @@
 package com.poros.smsgw.smpp;
 
+//comment added
 
 public class BaseReq {
 
