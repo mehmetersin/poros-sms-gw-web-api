@@ -15,5 +15,5 @@ public class UserRM implements RowMapper {
 		user.setUserId(rs.getInt("ID"));
 		return user;
 	}
-
+//
 }
